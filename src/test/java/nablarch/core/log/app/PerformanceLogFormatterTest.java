@@ -189,4 +189,21 @@ public class PerformanceLogFormatterTest extends LogTestSupport {
         formatter.start(point);
         assertThat(formatter.end(point, "result"), is("[point01:result]"));
     }
+
+    /**
+     * 2つのポイントでも動作する。
+     */
+    @Test
+    public void testTwoPoint() {
+        System.setProperty("nablarch.appLog.filePath", "classpath:nablarch/core/log/app/app-log-settings.properties");
+        System.setProperty("performanceLogFormatter.format", "[$point$:$result$]");
+
+        PerformanceLogFormatter formatter = new PerformanceLogFormatter();
+
+        formatter.start("point01");
+        formatter.start("point02");
+
+        assertThat(formatter.end("point02", "result02"), is("[point02:result02]"));
+        assertThat(formatter.end("point01", "result01"), is("[point01:result01]"));
+    }
 }

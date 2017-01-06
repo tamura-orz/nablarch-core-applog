@@ -1,16 +1,15 @@
 package nablarch.core.log.app;
 
 import nablarch.core.log.basic.LogWriterSupport;
-import org.junit.BeforeClass;
 import org.junit.Test;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
-import static org.junit.matchers.JUnitMatchers.containsString;
 
 /**
  * {@link nablarch.core.log.app.BasicCommitLogger}のテストクラス。
@@ -18,14 +17,6 @@ import static org.junit.matchers.JUnitMatchers.containsString;
  * @author hisaaki sioiri
  */
 public class BasicCommitLoggerTest {
-
-    /**
-     * {@link BasicCommitLogger}のstaticな初期化処理を走らせておく。
-     */
-    @BeforeClass
-    public static void setUpClass() {
-        new BasicCommitLogger();
-    }
 
     /**
      * {@link BasicCommitLogger#increment(long)}のテスト。
@@ -91,9 +82,8 @@ public class BasicCommitLoggerTest {
     @Test
     public void testIncrementNotInitialized() {
 
-        LogWriter.clear();
-
         BasicCommitLogger logger = new BasicCommitLogger();
+        LogWriter.clear();
         try {
             logger.increment(100);
             fail("");
@@ -110,9 +100,8 @@ public class BasicCommitLoggerTest {
     /** {@link nablarch.core.log.app.BasicCommitLogger#terminate()}のテスト。 */
     @Test
     public void testTerminate() {
-        LogWriter.clear();
-
         BasicCommitLogger logger = new BasicCommitLogger();
+        LogWriter.clear();
 
         logger.initialize();
         logger.setInterval(500);
