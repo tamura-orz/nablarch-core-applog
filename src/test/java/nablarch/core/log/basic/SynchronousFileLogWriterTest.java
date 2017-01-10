@@ -972,15 +972,13 @@ public class SynchronousFileLogWriterTest extends LogTestSupport {
 
         childThread.interrupt(); // 子スレッドに割り込み命令を投げる
 
-        Thread.sleep(100);
+        childThread.join();
 
         String appLog = LogTestUtil.getLog(monitorFile);
         assertTrue(appLog.indexOf("initialized.") != -1);
         assertTrue(appLog.indexOf("[[[childLog]]]") != -1); // 強制的にログが出力されている
 
         assertTrue(appLog.indexOf("interrupted while waiting for lock retry.") != -1); // ロックファイルが生成出来なかった旨のメッセージがログに出力されている
-
-        Thread.sleep(1000);
     }
 
 

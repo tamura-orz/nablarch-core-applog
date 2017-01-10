@@ -3,9 +3,7 @@ package nablarch.core.log.app;
 import nablarch.core.ThreadContext;
 import nablarch.core.log.LogTestSupport;
 import nablarch.core.log.Logger;
-import nablarch.core.log.basic.LogLevel;
 import nablarch.core.message.MockStringResourceHolder;
-import nablarch.fw.ExecutionContext;
 import nablarch.test.support.SystemRepositoryResource;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -86,8 +84,6 @@ public class FailureLogUtilTest extends LogTestSupport {
         FailureLogUtil.logFatal(new IllegalArgumentException("fatal_full_error"), data, "FW000001", new Object[] {"fatal_full_messageOption"}, new Object[] {"fatal_full_logOption"});
         FailureLogUtil.logFatal(new IllegalArgumentException("fatal_short_error"), data, "FW000002", "fatal_short_messageOption");
         FailureLogUtil.logFatal(data, "FW000003", "fatal_min_messageOption");
-        new ProcessAbnormalEnd(100, "FW000004", new Object[] {"fatal_ex_msg_short_messageOption"}).writeLog(null);
-        new ProcessAbnormalEnd(100, "FW000005", new Object[] {"fatal_ex_msg_full_messageOption"}).writeLog(null);
 
         // ERROR
         FailureLogUtil.logError(new IllegalArgumentException("error_full_error"), data, "FW000001", new Object[] {"error_full_messageOption"}, new Object[] {"error_full_logOption"});
@@ -120,20 +116,6 @@ public class FailureLogUtilTest extends LogTestSupport {
 
         assertThat(monitorFile.get(index), is("FATAL fail_code = [FW000003] FW000003メッセージfatal_min_messageOption" + Logger.LS));
         assertThat(appFile.get(index), containsString("FATAL ROO fail_code = [FW000003] FW000003メッセージfatal_min_messageOption"));
-
-        // fatal_ex_msg_short
-
-        index++;
-
-        assertThat(monitorFile.get(index), is("FATAL fail_code = [FW000004] FW000004メッセージfatal_ex_msg_short_messageOption" + Logger.LS));
-        assertThat(appFile.get(index), containsString("FATAL ROO fail_code = [FW000004] FW000004メッセージfatal_ex_msg_short_messageOption"));
-
-        // fatal_ex_msg_full
-
-        index++;
-
-        assertThat(monitorFile.get(index), is("FATAL fail_code = [FW000005] FW000005メッセージfatal_ex_msg_full_messageOption" + Logger.LS));
-        assertThat(appFile.get(index), containsString("FATAL ROO fail_code = [FW000005] FW000005メッセージfatal_ex_msg_full_messageOption"));
 
         // error_full
 
@@ -213,46 +195,5 @@ public class FailureLogUtilTest extends LogTestSupport {
 
         assertThat(monitorFile.get(0), is("FATAL fail_code:[FW000001] [FW000001メッセージfatal_full_messageOption] {age=20, name=hoge, password=*****, password1=*****}" + Logger.LS));
         assertThat(appFile.get(0), containsString("FATAL ROO fail_code<FW000001> <FW000001メッセージfatal_full_messageOption> {age=20, name=hoge, password=*****, password1=*****}"));
-    }
-
-    /**
-     * {@link nablarch.fw.launcher.ProcessAbnormalEnd}のモッククラス。
-     * ログ出力する。
-     */
-    public static class ProcessAbnormalEnd extends RuntimeException {
-        /** ログレベル */
-        private LogLevel logLevel = LogLevel.FATAL;
-
-        /** メッセージID */
-        private String messageId = null;
-
-        /** メッセージ埋め込みパラメータ */
-        private Object[] messageParams = new Object[]{};
-
-        /** ログのオプション情報 */
-        private Object[] logOptions = new Object[]{};
-
-        public ProcessAbnormalEnd(int exitCode, String failureCode, Object... messageOptions) {
-            messageId = failureCode;
-            messageParams = messageOptions;
-        }
-
-        public void writeLog(ExecutionContext context) {
-            Object data = context != null ? context.getDataProcessedWhenThrown(this) : null;
-            switch (logLevel) {
-                case FATAL:
-                    FailureLogUtil.logFatal(
-                            this, data, messageId, messageParams, logOptions
-                    );
-                    break;
-                case ERROR:
-                    FailureLogUtil.logError(
-                            this, data, messageId, messageParams, logOptions
-                    );
-                    break;
-                default:
-                    // nop
-            }
-        }
     }
 }
