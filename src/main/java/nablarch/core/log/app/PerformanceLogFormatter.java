@@ -161,7 +161,11 @@ public class PerformanceLogFormatter {
     public String end(String point, String result) {
         
         String contextId = ThreadContext.getExecutionId() + point;
-        PerformanceLogContext context = contextMap.get().remove(contextId);
+        Map<String, PerformanceLogContext> localMap = contextMap.get();
+        PerformanceLogContext context = localMap.remove(contextId);
+        if (localMap.isEmpty()) {
+            contextMap.remove();
+        }
         if (context == null) {
             throw new IllegalStateException(
                 String.format("PerformanceLogContext was not found. point = [%s], execution id = [%s]",
